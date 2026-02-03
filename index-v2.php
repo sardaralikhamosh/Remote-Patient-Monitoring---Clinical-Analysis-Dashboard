@@ -4,63 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RPM Clinical Analysis Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* Base styles remain the same */
 * { margin:0; padding:0; box-sizing:border-box; }
 
-:root {
-    --primary-bg:#ffffff;
-    --secondary-bg:#f8f9fa;
-    --border:#e0e5eb;
-    --txt:#1a1f36;
-    --txt2:#697386;
-    --red:#ef4444;
-    --amber:#f59e0b;
-    --green:#10b981;
-    --grey:#6b7280;
-    --teal:#0891b2;
-    --orange:#f97316;
-}
-
 body {
-    font-family:'Inter',-apple-system,sans-serif;
-    background:var(--secondary-bg);
-    color:var(--txt);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background:#f8f9fa;
+    color:#1a1f36;
     line-height:1.5;
-    margin:0; padding:0;
 }
 
-/* Controls Bar */
 .controls-bar {
     background:linear-gradient(135deg,#667eea,#764ba2);
     padding:10px 24px;
     display:flex; gap:12px;
-    align-items:center; justify-content:flex-end;
-    box-shadow:0 2px 8px rgba(0,0,0,.12);
+    justify-content:flex-end;
 }
 .btn {
     padding:9px 18px; border:none; border-radius:6px;
-    font:600 13px/1 'Inter',sans-serif;
-    cursor:pointer; display:flex; align-items:center; gap:6px;
+    font-weight:600; font-size:13px; cursor:pointer;
     transition:all .2s;
 }
-.btn:hover { transform:translateY(-1px); box-shadow:0 4px 10px rgba(0,0,0,.18); }
 .btn-reset { background:#ef4444; color:#fff; }
-.btn-reset:hover { background:#dc2626; }
 .btn-print { background:#fff; color:#667eea; }
-.btn-print:hover { background:#f0f4ff; }
 
-/* Header */
 .header {
     background:linear-gradient(135deg,#1a1f36,#2d3748);
     color:#fff; padding:14px 28px;
-    box-shadow:0 2px 4px rgba(0,0,0,.1);
 }
-.header h1 { font-size:18px; font-weight:700; margin-bottom:2px; }
+.header h1 { font-size:18px; font-weight:700; }
 .header p  { font-size:11px; opacity:.85; }
 
-/* Main Grid */
 .main-layout {
     display:grid;
     grid-template-columns:30% 70%;
@@ -69,8 +43,8 @@ body {
 
 .left-column {
     background:#fafbfc;
-    border-right:2px solid var(--border);
-    padding:16px 14px;
+    border-right:2px solid #e0e5eb;
+    padding:16px;
     display:flex; flex-direction:column; gap:14px;
 }
 
@@ -79,411 +53,327 @@ body {
     display:flex; flex-direction:column; gap:16px;
 }
 
-/* Traffic Light */
 .tl-wrap {
     background:#2d3748;
-    padding:14px 18px;
+    padding:14px;
     border-radius:22px;
-    box-shadow:0 4px 12px rgba(0,0,0,.15);
     margin:0 auto;
 }
-.tl { display:flex; gap:14px; justify-content:center; }
-.lw { position:relative; }
+.tl { display:flex; gap:14px; }
 .light {
-    width:48px; height:48px; border-radius:50%; cursor:pointer;
-    transition:all .3s cubic-bezier(.4,0,.2,1);
+    width:48px; height:48px; border-radius:50%;
     box-shadow:inset 0 2px 8px rgba(0,0,0,.3);
-    position:relative;
 }
-.light::after {
-    content:''; position:absolute; inset:7px; border-radius:50%;
-    background:linear-gradient(135deg,rgba(255,255,255,.4),transparent);
-}
-.light:hover { transform:scale(1.08); }
-.light.c-red    { background:#ef4444; box-shadow:0 0 22px rgba(239,68,68,.6),inset 0 2px 8px rgba(0,0,0,.3); }
-.light.c-yellow { background:#f59e0b; box-shadow:0 0 22px rgba(245,158,11,.6),inset 0 2px 8px rgba(0,0,0,.3); }
-.light.c-green  { background:#10b981; box-shadow:0 0 22px rgba(16,185,129,.6),inset 0 2px 8px rgba(0,0,0,.3); }
-.light.c-grey   { background:#6b7280; box-shadow:inset 0 2px 8px rgba(0,0,0,.3); }
+.light.c-grey { background:#6b7280; }
+.light.c-yellow { background:#f59e0b; box-shadow:0 0 22px rgba(245,158,11,.6); }
 
-.col-drop {
-    position:absolute; top:58px; left:50%; transform:translateX(-50%);
-    background:#fff; border-radius:10px; padding:6px;
-    box-shadow:0 8px 24px rgba(0,0,0,.2);
-    display:none; z-index:1000; border:1px solid var(--border);
-}
-.col-drop.open { display:block; }
-.col-opt {
-    width:34px; height:34px; border-radius:50%; margin:3px; cursor:pointer;
-    transition:all .2s; border:3px solid transparent;
-    box-shadow:0 2px 6px rgba(0,0,0,.15); display:inline-block;
-}
-.col-opt:hover { transform:scale(1.18); border-color:#667eea; }
-.col-opt.red    { background:#ef4444; }
-.col-opt.yellow { background:#f59e0b; }
-.col-opt.green  { background:#10b981; }
-.col-opt.grey   { background:#6b7280; }
-
-/* Risk Factors */
 .section-hd {
-    font-size:13px; font-weight:700; color:var(--txt);
-    display:flex; justify-content:space-between; align-items:center;
+    font-size:13px; font-weight:700;
     margin-bottom:8px;
 }
 .risk-list {
-    background:#fff; border-radius:8px; padding:10px;
-    border:1px solid var(--border);
+    background:#fff;
+    border-radius:8px;
+    padding:10px;
+    border:1px solid #e0e5eb;
 }
 .risk-item {
-    display:flex; gap:5px; margin-bottom:7px;
-    font-size:11.5px; line-height:1.45; align-items:flex-start;
+    display:flex; gap:5px;
+    margin-bottom:7px;
+    font-size:11.5px;
+    line-height:1.45;
 }
-.risk-item:last-child { margin-bottom:0; }
-.risk-num { flex-shrink:0; font-weight:700; color:var(--red); min-width:18px; padding-top:1px; }
+.risk-num {
+    flex-shrink:0;
+    font-weight:700;
+    color:#ef4444;
+}
 .risk-txt {
-    flex:1; border:1px solid transparent; border-radius:4px;
-    padding:3px 5px; background:transparent; transition:all .2s;
-    font-size:11.5px; line-height:1.4;
+    flex:1;
 }
-.risk-txt:focus { outline:none; border-color:#667eea; background:#f0f4ff; }
-.risk-txt[contenteditable="true"]:hover { background:#fafbfc; border-color:var(--border); }
 
-/* Control Buttons */
-.cb {
-    width:20px; height:20px; border:none; border-radius:50%;
-    cursor:pointer; display:flex; align-items:center; justify-content:center;
-    font-size:13px; line-height:1; transition:all .15s;
-    flex-shrink:0; padding:0;
-}
-.cb:hover { transform:scale(1.18); }
-.cb.add { background:#10b981; color:#fff; }
-.cb.add:hover { background:#059669; }
-.cb.del { background:#ef4444; color:#fff; }
-.cb.del:hover { background:#dc2626; }
-
-/* IMAGE PASTE BOX - COMPLETELY FIXED */
-.paste-box-outer {
-    border:1px solid var(--border);
-    border-radius:8px;
+/* IMAGE UPLOAD BOX */
+.img-upload-box {
+    border:2px dashed #e0e5eb;
+    border-radius:10px;
     background:#fff;
-    overflow:hidden;
-    position: relative;
-    min-height: 200px;
+    padding:16px;
+    text-align:center;
 }
 
-/* Toolbar */
-.paste-toolbar {
-    display:flex; align-items:center; gap:6px;
-    padding:6px 8px;
-    background:#f4f6f8;
-    border-bottom:1px solid var(--border);
-    flex-wrap:wrap;
-}
-.paste-toolbar .tb-label {
-    font-size:10px; font-weight:600; color:var(--txt2);
-    white-space:nowrap;
-}
-.paste-toolbar .tb-btn {
-    padding:3px 8px; border:1px solid var(--border); border-radius:4px;
-    background:#fff; font-size:10px; font-weight:600; color:var(--txt);
-    cursor:pointer; transition:all .15s; white-space:nowrap;
-}
-.paste-toolbar .tb-btn:hover { background:#f0f4ff; border-color:#667eea; color:#667eea; }
-.paste-toolbar .tb-btn.danger { color:var(--red); }
-.paste-toolbar .tb-btn.danger:hover { background:#fef2f2; border-color:var(--red); }
-
-/* Upload button wrapper */
-.upload-btn-wrap {
-    position: relative;
-    display: inline-block;
-}
-.upload-btn-wrap input[type="file"] {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    z-index: 2;
-}
-.upload-btn-wrap .tb-btn {
-    position: relative;
-    z-index: 1;
-    pointer-events: none;
+.upload-form {
+    margin-bottom:12px;
 }
 
-/* Size slider */
-.size-row {
-    display:none;
-    align-items:center; gap:6px;
-    padding:5px 8px;
-    background:#f9fafb;
-    border-bottom:1px solid var(--border);
-}
-.size-row.visible { display: flex; }
-.size-row label { font-size:10px; font-weight:600; color:var(--txt2); white-space:nowrap; }
-.size-row input[type=range] {
-    flex:1; height:4px;
-    -webkit-appearance:none; appearance:none;
-    background:#cbd5e0; border-radius:2px; outline:none;
-}
-.size-row input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance:none; appearance:none;
-    width:14px; height:14px; border-radius:50%;
-    background:#667eea; cursor:pointer;
-}
-.size-row input[type=range]::-moz-range-thumb {
-    width:14px; height:14px; border-radius:50%;
-    background:#667eea; cursor:pointer; border:none;
-}
-.size-row .sz-val { font-size:10px; font-weight:700; color:#667eea; min-width:28px; text-align:right; }
-
-/* Paste zone */
-.paste-inner {
-    width: 100%;
-    min-height: 150px;
-    background: #fff;
-    position: relative;
-    outline: none;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.paste-inner:focus {
-    box-shadow: inset 0 0 0 2px #667eea;
-}
-.paste-inner.dragover {
-    background: #eef2ff;
+.file-input-wrapper {
+    position:relative;
+    display:inline-block;
 }
 
-/* Placeholder */
-.paste-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    cursor: pointer;
-    user-select: none;
-}
-.paste-placeholder .ph-icon { font-size: 32px; margin-bottom: 8px; }
-.paste-placeholder .ph-txt {
-    font-size: 11px; color: var(--txt2); font-weight: 500;
-    text-align: center; line-height: 1.6;
+.upload-label {
+    padding:10px 16px;
+    background:#667eea;
+    color:#fff;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    display:inline-block;
 }
 
-/* The displayed image */
-#pastedImg {
-    max-width: 100%;
-    max-height: 400px;
-    object-fit: contain;
-    display: none;
-}
-#pastedImg.visible {
-    display: block;
+.file-input-wrapper input[type=file] {
+    position:absolute;
+    left:0; top:0;
+    width:100%;
+    height:100%;
+    opacity:0;
+    cursor:pointer;
 }
 
-/* Metric Row */
+.upload-btn {
+    padding:8px 14px;
+    background:#10b981;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    margin-left:8px;
+}
+
+.uploaded-img {
+    max-width:100%;
+    max-height:200px;
+    border-radius:6px;
+    margin-top:10px;
+}
+
+.no-image {
+    color:#697386;
+    font-size:12px;
+    padding:20px;
+}
+
 .metric-row {
     display:grid;
     grid-template-columns:75% 25%;
+    gap:20px;
     padding-bottom:16px;
-    border-bottom:2px solid var(--border);
+    border-bottom:2px solid #e0e5eb;
 }
-.metric-row:last-child { border-bottom:none; padding-bottom:0; }
-.text-section { display:flex; flex-direction:column; gap:8px; }
+.metric-row:last-child { border-bottom:none; }
+
 .metric-header {
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom:4px;
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:8px;
 }
 .date-inp {
-    background:#1a1f36; color:#fff; border:none;
-    padding:5px 10px; border-radius:6px;
-    font:600 10px/1 'Inter',sans-serif;
-    text-transform:uppercase; cursor:pointer; letter-spacing:.5px;
+    background:#1a1f36;
+    color:#fff;
+    padding:5px 10px;
+    border:none;
+    border-radius:6px;
+    font-size:10px;
+    font-weight:600;
 }
-.date-inp::-webkit-calendar-picker-indicator { filter:invert(1); cursor:pointer; }
-.m-title { font-size:20px; font-weight:800; letter-spacing:-.02em; text-transform:uppercase; }
-.m-title.hospital { color:var(--red); }
-.m-title.hhcahps  { color:var(--teal); }
-.m-title.hospice  { color:var(--orange); }
+.m-title {
+    font-size:20px;
+    font-weight:800;
+    text-transform:uppercase;
+}
+.m-title.hospital { color:#ef4444; }
+.m-title.hhcahps { color:#0891b2; }
+.m-title.hospice { color:#f97316; }
+
 .bullet-list {
-    background:#fafbfc; border:1px solid var(--border);
-    border-radius:8px; padding:12px;
+    background:#fafbfc;
+    border:1px solid #e0e5eb;
+    border-radius:8px;
+    padding:12px;
 }
 .bullet-item {
-    display:flex; gap:5px; margin-bottom:7px;
-    font-size:11.5px; line-height:1.5; color:var(--txt); align-items:flex-start;
+    font-size:11.5px;
+    line-height:1.5;
+    margin-bottom:7px;
 }
-.bullet-item:last-child { margin-bottom:0; }
-.bullet-item .bdot { flex-shrink:0; font-weight:700; padding-top:1px; }
-.bullet-txt {
-    flex:1; border:1px solid transparent; border-radius:4px;
-    padding:2px 4px; background:transparent; transition:all .2s;
-}
-.bullet-txt:focus { outline:none; border-color:#667eea; background:#fff; }
-.bullet-txt[contenteditable="true"]:hover { background:#fff; border-color:var(--border); }
 
-/* Gauge */
-.gauge-col { display:flex; flex-direction:column; gap:8px; align-items:center; }
-.gauge-wrap { position:relative; width:100%; max-width:180px; aspect-ratio:1; }
-canvas { width:100%; height:100%; }
+.gauge-col {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    align-items:center;
+}
+.gauge-wrap {
+    position:relative;
+    width:180px;
+    height:180px;
+}
+canvas {
+    width:100%;
+    height:100%;
+}
 .gauge-over {
-    position:absolute; top:44%; left:50%; transform:translate(-50%,-50%);
-    text-align:center; pointer-events:none;
+    position:absolute;
+    top:44%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
 }
-.g-emoji { font-size:32px; display:block; margin-bottom:4px; }
-.g-score { font-size:24px; font-weight:800; line-height:1; }
-.g-label { font-size:9px; font-weight:600; color:var(--txt2); text-transform:uppercase; letter-spacing:.05em; margin-top:3px; }
-.score-inp-wrap { width:100%; max-width:180px; }
+.g-emoji {
+    font-size:32px;
+    display:block;
+}
+.g-score {
+    font-size:24px;
+    font-weight:800;
+}
+.g-label {
+    font-size:9px;
+    font-weight:600;
+    color:#697386;
+    text-transform:uppercase;
+}
 .score-inp {
-    width:100%; padding:7px; border:2px solid var(--border); border-radius:6px;
-    font:700 15px/1 'Inter',sans-serif; text-align:center; transition:all .2s;
+    width:180px;
+    padding:7px;
+    border:2px solid #e0e5eb;
+    border-radius:6px;
+    font-weight:700;
+    font-size:15px;
+    text-align:center;
 }
-.score-inp:focus { outline:none; border-color:#667eea; box-shadow:0 0 0 3px rgba(102,126,234,.1); }
 .g-legend {
-    display:flex; justify-content:space-between; gap:3px;
-    width:100%; max-width:180px; flex-wrap:wrap;
+    display:flex;
+    gap:6px;
+    width:180px;
+    justify-content:space-between;
+    flex-wrap:wrap;
 }
-.g-leg-item { display:flex; align-items:center; gap:3px; font-size:7.5px; font-weight:600; text-transform:uppercase; white-space:nowrap; }
-.g-leg-clr { width:9px; height:9px; border-radius:2px; flex-shrink:0; }
+.g-leg-item {
+    display:flex;
+    align-items:center;
+    gap:3px;
+    font-size:7.5px;
+    font-weight:600;
+}
+.g-leg-clr {
+    width:9px;
+    height:9px;
+    border-radius:2px;
+}
 
-/* Print */
 @media print {
-    @page { size: A4 landscape; margin: 0; }
-    html, body {
-        width: 297mm; height: 210mm;
-        overflow: hidden; background: #fff;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+    .controls-bar, .upload-form, .score-inp { 
+        display:none !important; 
     }
-    .print-scale-root { width: 297mm; height: 210mm; transform-origin: top left; }
-    .controls-bar, .cb, .paste-toolbar, .size-row, .score-inp-wrap, .col-drop { display:none !important; }
-    [contenteditable="true"] { border:none !important; background:transparent !important; outline:none !important; }
-    .paste-placeholder { display:none !important; }
-    .paste-inner { min-height:0; padding:0; }
-    #pastedImg { display:block !important; max-width:100% !important; }
 }
 </style>
 </head>
 <body>
 
-<div class="print-scale-root" id="printRoot">
+<?php
+$uploadedImage = '';
 
-<!-- Controls -->
+if (!empty($_FILES['graph']['name'])) {
+    $dir = __DIR__ . '/uploads/';
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+    $name = time() . '_' . basename($_FILES['graph']['name']);
+    $path = $dir . $name;
+
+    if (move_uploaded_file($_FILES['graph']['tmp_name'], $path)) {
+        $uploadedImage = 'uploads/' . $name;
+    }
+}
+?>
+
 <div class="controls-bar">
-    <button class="btn btn-reset" onclick="resetDashboard()">🔄 Reset</button>
-    <button class="btn btn-print" onclick="printDashboard()">🖨️ Print</button>
+    <button class="btn btn-reset" onclick="window.location.reload()">🔄 Reset</button>
+    <button class="btn btn-print" onclick="window.print()">🖨️ Print</button>
 </div>
 
-<!-- Header -->
 <div class="header">
     <h1>🏥 Remote Patient Monitoring – Clinical Analysis Dashboard</h1>
     <p>Comprehensive risk assessment and care coordination metrics | Generated by Clinical Care Team</p>
 </div>
 
-<!-- Main -->
 <div class="main-layout">
 
 <!-- LEFT COLUMN -->
 <div class="left-column">
 
-    <!-- Traffic Light -->
     <div class="tl-wrap">
         <div class="tl">
-            <div class="lw">
-                <div class="light c-grey" onclick="openDrop(0)"></div>
-                <div class="col-drop" id="drop0">
-                    <div class="col-opt red" onclick="setLight(0,'red')"></div>
-                    <div class="col-opt yellow" onclick="setLight(0,'yellow')"></div>
-                    <div class="col-opt green" onclick="setLight(0,'green')"></div>
-                    <div class="col-opt grey" onclick="setLight(0,'grey')"></div>
-                </div>
-            </div>
-            <div class="lw">
-                <div class="light c-yellow" onclick="openDrop(1)"></div>
-                <div class="col-drop" id="drop1">
-                    <div class="col-opt red" onclick="setLight(1,'red')"></div>
-                    <div class="col-opt yellow" onclick="setLight(1,'yellow')"></div>
-                    <div class="col-opt green" onclick="setLight(1,'green')"></div>
-                    <div class="col-opt grey" onclick="setLight(1,'grey')"></div>
-                </div>
-            </div>
-            <div class="lw">
-                <div class="light c-grey" onclick="openDrop(2)"></div>
-                <div class="col-drop" id="drop2">
-                    <div class="col-opt red" onclick="setLight(2,'red')"></div>
-                    <div class="col-opt yellow" onclick="setLight(2,'yellow')"></div>
-                    <div class="col-opt green" onclick="setLight(2,'green')"></div>
-                    <div class="col-opt grey" onclick="setLight(2,'grey')"></div>
-                </div>
-            </div>
+            <div class="light c-grey"></div>
+            <div class="light c-yellow"></div>
+            <div class="light c-grey"></div>
         </div>
     </div>
 
-    <!-- Risk Factors -->
     <div>
-        <div class="section-hd">
-            High Risk Factors
-            <button class="cb add" onclick="addRisk()">+</button>
+        <div class="section-hd">High Risk Factors</div>
+        <div class="risk-list">
+            <div class="risk-item"><div class="risk-num">1.</div><div class="risk-txt">Indwelling Foley catheter with leaking and discomfort complications</div></div>
+            <div class="risk-item"><div class="risk-num">2.</div><div class="risk-txt">UTI risk 35-40% from catheter since 12/10/25</div></div>
+            <div class="risk-item"><div class="risk-num">3.</div><div class="risk-txt">Untreated Stage 1-2 HTN: BP 144-151/71 mmHg</div></div>
+            <div class="risk-item"><div class="risk-num">4.</div><div class="risk-txt">Zero antihypertensive medications despite age 79 and HTN</div></div>
+            <div class="risk-item"><div class="risk-num">5.</div><div class="risk-txt">History of falling without documented fall assessment</div></div>
+            <div class="risk-item"><div class="risk-num">6.</div><div class="risk-txt">Voiding trial scheduled 12/19/25 with 20-25% failure risk</div></div>
+            <div class="risk-item"><div class="risk-num">7.</div><div class="risk-txt">Incomplete medication list: only 2 medications documented</div></div>
+            <div class="risk-item"><div class="risk-num">8.</div><div class="risk-txt">Headaches potentially indicating uncontrolled hypertension symptoms</div></div>
+            <div class="risk-item"><div class="risk-num">9.</div><div class="risk-txt">Walker dependent with taxing effort limiting mobility</div></div>
+            <div class="risk-item"><div class="risk-num">10.</div><div class="risk-txt">Age 79 with stroke/MI risk 12-18% annually</div></div>
+            <div class="risk-item"><div class="risk-num">11.</div><div class="risk-txt">No orthostatic BP measurements despite fall history</div></div>
+            <div class="risk-item"><div class="risk-num">12.</div><div class="risk-txt">Tylenol 1000mg single dose exceeds recommended 650mg</div></div>
         </div>
-        <div class="risk-list" id="riskList"></div>
     </div>
 
-    <!-- IMAGE BOX - FIXED -->
-    <div class="paste-box-outer" id="pasteBoxOuter">
-        <!-- Toolbar -->
-        <div class="paste-toolbar">
-            <span class="tb-label">Trend Graph</span>
-            <label class="upload-btn-wrap">
-                <span class="tb-btn">📂 Upload</span>
-                <input type="file" id="fileIn" accept="image/*">
-            </label>
-            <button class="tb-btn danger" id="removeBtn" style="display:none;" onclick="clearImage()">✕ Remove</button>
-        </div>
-
-        <!-- Size slider -->
-        <div class="size-row" id="sizeRow">
-            <label>Size</label>
-            <input type="range" id="sizeSlider" min="30" max="100" value="100" oninput="resizeImg(this.value)">
-            <span class="sz-val" id="sizeVal">100%</span>
-        </div>
-
-        <!-- Paste zone -->
-        <div class="paste-inner" id="pasteInner" tabindex="0">
-            <div class="paste-placeholder" id="pastePlaceholder">
-                <div class="ph-icon">📊</div>
-                <div class="ph-txt">📋 Paste screenshot here (Ctrl+V)<br><span style="opacity:.7;">or click Upload / drag &amp; drop</span></div>
+    <!-- IMAGE UPLOAD -->
+    <div class="img-upload-box">
+        <form method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="file-input-wrapper">
+                <label class="upload-label">
+                    📂 Choose Graph
+                    <input type="file" name="graph" accept="image/*" onchange="this.form.submit()">
+                </label>
             </div>
-            <img id="pastedImg" alt="Trend graph">
-        </div>
+        </form>
+
+        <?php if (!empty($uploadedImage)): ?>
+            <img src="<?= htmlspecialchars($uploadedImage) ?>" class="uploaded-img" alt="Trend graph">
+        <?php else: ?>
+            <div class="no-image">No graph uploaded yet</div>
+        <?php endif; ?>
     </div>
 
-</div><!-- end left -->
+</div>
 
 <!-- RIGHT COLUMN -->
 <div class="right-column">
-    <!-- Rows with gauges remain the same... continuing in next part -->
-    <!-- ROW 1 – Hospital Risk -->
+
+    <!-- ROW 1 -->
     <div class="metric-row">
-        <div class="text-section">
+        <div>
             <div class="metric-header">
-                <input type="date" class="date-inp" id="date1" value="2024-06-24">
+                <input type="date" class="date-inp" value="2024-06-24">
                 <div class="m-title hospital">HOSPITAL RISK</div>
             </div>
-            <div class="section-hd" style="margin-bottom:4px;">
-                <span style="font-size:10px;color:var(--txt2);font-weight:600;">Clinical Notes</span>
-                <button class="cb add" onclick="addBullet('bList1')">+</button>
+            <div class="bullet-list">
+                <div class="bullet-item">• David's Blood Pressure monitoring is critically absent with no BP readings documented despite HTN diagnosis and hydrochlorothiazide 12.5mg with hold parameter "if SBP &lt;110"; cannot assess control or hypotension risk</div>
+                <div class="bullet-item">• David has engaged with care team through skilled nursing visits for complex wound care, colostomy management, and suprapubic catheter care at board and care facility</div>
+                <div class="bullet-item">• David had 0 BP measurements documented despite HTN diagnosis requiring urgent monitoring establishment</div>
+                <div class="bullet-item">• David has board and care facility caregivers providing 24-hour supervision and assistance as documented in clinical notes</div>
             </div>
-            <div class="bullet-list" id="bList1"></div>
         </div>
         <div class="gauge-col">
-            <div class="score-inp-wrap"><input type="number" class="score-inp" id="si1" min="0" max="100" value="68" oninput="updScore(1,this.value)"></div>
+            <input type="number" class="score-inp" value="68" min="0" max="100" onchange="draw(1,this.value)">
             <div class="gauge-wrap">
                 <canvas id="g1" width="400" height="400"></canvas>
                 <div class="gauge-over">
                     <span class="g-emoji" id="e1">😟</span>
-                    <div class="g-score" id="s1">68<span style="font-size:18px">%</span></div>
+                    <div class="g-score" id="s1" style="color:#ef4444">68%</div>
                     <div class="g-label">Risk Score</div>
                 </div>
             </div>
@@ -495,26 +385,26 @@ canvas { width:100%; height:100%; }
         </div>
     </div>
 
-    <!-- ROW 2 – HHCAHPS -->
+    <!-- ROW 2 -->
     <div class="metric-row">
-        <div class="text-section">
+        <div>
             <div class="metric-header">
-                <input type="date" class="date-inp" id="date2" value="2024-06-24">
+                <input type="date" class="date-inp" value="2024-06-24">
                 <div class="m-title hhcahps">HHCAHPS</div>
             </div>
-            <div class="section-hd" style="margin-bottom:4px;">
-                <span style="font-size:10px;color:var(--txt2);font-weight:600;">Clinical Notes</span>
-                <button class="cb add" onclick="addBullet('bList2')">+</button>
+            <div class="bullet-list">
+                <div class="bullet-item">• Katherine has routine contact with care team through scheduled skilled nursing (SN) and physical therapy (PT) visits</div>
+                <div class="bullet-item">• Katherine has NOT initiated contact on her own via SMS or phone (no documentation of patient-initiated contact)</div>
+                <div class="bullet-item">• Katherine's care team includes: Ana Moreno-Quirarte RN (medication review, assessment), Lindsay PTA (physical therapy visits), and physician oversight</div>
             </div>
-            <div class="bullet-list" id="bList2"></div>
         </div>
         <div class="gauge-col">
-            <div class="score-inp-wrap"><input type="number" class="score-inp" id="si2" min="0" max="100" value="70" oninput="updScore(2,this.value)"></div>
+            <input type="number" class="score-inp" value="70" min="0" max="100" onchange="draw(2,this.value)">
             <div class="gauge-wrap">
                 <canvas id="g2" width="400" height="400"></canvas>
                 <div class="gauge-over">
                     <span class="g-emoji" id="e2">😊</span>
-                    <div class="g-score" id="s2">70<span style="font-size:18px">%</span></div>
+                    <div class="g-score" id="s2" style="color:#10b981">70%</div>
                     <div class="g-label">HHCAHPS Score</div>
                 </div>
             </div>
@@ -526,26 +416,26 @@ canvas { width:100%; height:100%; }
         </div>
     </div>
 
-    <!-- ROW 3 – Hospice Need -->
+    <!-- ROW 3 -->
     <div class="metric-row">
-        <div class="text-section">
+        <div>
             <div class="metric-header">
-                <input type="date" class="date-inp" id="date3" value="2024-06-24">
+                <input type="date" class="date-inp" value="2024-06-24">
                 <div class="m-title hospice">HOSPICE NEED</div>
             </div>
-            <div class="section-hd" style="margin-bottom:4px;">
-                <span style="font-size:10px;color:var(--txt2);font-weight:600;">Clinical Notes</span>
-                <button class="cb add" onclick="addBullet('bList3')">+</button>
+            <div class="bullet-list">
+                <div class="bullet-item">• Katherine has NOT had a kidney transplant (no transplant history documented)</div>
+                <div class="bullet-item">• Katherine's weight: Not documented in available records (weight monitoring needed)</div>
+                <div class="bullet-item">• Katherine reports: "Lots of pain" documented in clinical notes; exhaustion documented as risk factor; pain management with ice/medication education provided</div>
             </div>
-            <div class="bullet-list" id="bList3"></div>
         </div>
         <div class="gauge-col">
-            <div class="score-inp-wrap"><input type="number" class="score-inp" id="si3" min="0" max="100" value="70" oninput="updScore(3,this.value)"></div>
+            <input type="number" class="score-inp" value="70" min="0" max="100" onchange="draw(3,this.value)">
             <div class="gauge-wrap">
                 <canvas id="g3" width="400" height="400"></canvas>
                 <div class="gauge-over">
                     <span class="g-emoji" id="e3">😊</span>
-                    <div class="g-score" id="s3">70<span style="font-size:18px">%</span></div>
+                    <div class="g-score" id="s3" style="color:#10b981">70%</div>
                     <div class="g-label">Care Need Score</div>
                 </div>
             </div>
@@ -557,336 +447,87 @@ canvas { width:100%; height:100%; }
         </div>
     </div>
 
-</div><!-- end right -->
-</div><!-- end main-layout -->
-</div><!-- end printRoot -->
+</div>
+</div>
 
 <script>
-// Sample Data
-const DATA = {
-  risks:[
-    "Indwelling Foley catheter with leaking and discomfort complications",
-    "UTI risk 35-40% from catheter since 12/10/25",
-    "Untreated Stage 1-2 HTN: BP 144-151/71 mmHg",
-    "Zero antihypertensive medications despite age 79 and HTN",
-    "History of falling without documented fall assessment",
-    "Voiding trial scheduled 12/19/25 with 20-25% failure risk",
-    "Incomplete medication list: only 2 medications documented",
-    "Headaches potentially indicating uncontrolled hypertension symptoms",
-    "Walker dependent with taxing effort limiting mobility",
-    "Age 79 with stroke/MI risk 12-18% annually",
-    "No orthostatic BP measurements despite fall history",
-    "Tylenol 1000mg single dose exceeds recommended 650mg"
-  ],
-  hosp:[
-    'David\'s Blood Pressure monitoring is critically absent with no BP readings documented despite HTN diagnosis and hydrochlorothiazide 12.5mg with hold parameter "if SBP &lt;110"; cannot assess control or hypotension risk',
-    "David has engaged with care team through skilled nursing visits for complex wound care, colostomy management, and suprapubic catheter care at board and care facility",
-    "David had 0 BP measurements documented despite HTN diagnosis requiring urgent monitoring establishment",
-    "David has board and care facility caregivers providing 24-hour supervision and assistance as documented in clinical notes",
-    "David has limited family support with emergency contact Louis Hernandez; caregivers at facility provide total assistance for mobility, transfers, and ADLs as needed"
-  ],
-  hhc:[
-    "Katherine has routine contact with care team through scheduled skilled nursing (SN) and physical therapy (PT) visits",
-    "Katherine has NOT initiated contact on her own via SMS or phone (no documentation of patient-initiated contact)",
-    "Katherine's care team includes: Ana Moreno-Quirarte RN (medication review, assessment), Lindsay PTA (physical therapy visits), and physician oversight"
-  ],
-  hosp2:[
-    "Katherine has NOT had a kidney transplant (no transplant history documented)",
-    "Katherine's weight: Not documented in available records (weight monitoring needed)",
-    'Katherine reports: "Lots of pain" documented in clinical notes; exhaustion documented as risk factor; pain management with ice/medication education provided',
-    "Katherine does NOT have a stage 2 wound (surgical wound from right hip replacement; no current wound documented)"
-  ]
-};
+// GAUGE DRAW FUNCTION
+function draw(n, v) {
+    v = Math.max(0, Math.min(100, parseInt(v)));
+    var t = n===1 ? 'h' : 'o';
+    var c = document.getElementById('g'+n);
+    var x = c.getContext('2d');
+    var w = c.width, h = c.height;
+    var cx = w/2, cy = h/2, r = 150;
 
-// Risk List Functions
-function mkRisk(txt, el){
-  const d=document.createElement('div');
-  d.className='risk-item';
-  d.innerHTML=`<div class="risk-num"></div><div class="risk-txt" contenteditable="true">${txt}</div><button class="cb del" onclick="this.closest('.risk-item').remove();renum()">×</button>`;
-  el.appendChild(d);
-}
-function renum(){
-  document.querySelectorAll('#riskList .risk-num').forEach((n,i)=>n.textContent=(i+1)+'.');
-}
-function initRisks(){
-  const el=document.getElementById('riskList');
-  el.innerHTML='';
-  DATA.risks.forEach(t=>mkRisk(t,el));
-  renum();
-}
-function addRisk(){
-  const el=document.getElementById('riskList');
-  mkRisk('New risk factor…',el);
-  renum();
-  const last=[...el.querySelectorAll('.risk-txt')].pop();
-  last.focus();
-  const r=document.createRange(); r.selectNodeContents(last);
-  const s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
-}
+    x.clearRect(0,0,w,h);
 
-// Bullet List Functions
-function mkBullet(txt, el){
-  const d=document.createElement('div');
-  d.className='bullet-item';
-  d.innerHTML=`<span class="bdot">•</span><div class="bullet-txt" contenteditable="true">${txt}</div><button class="cb del" onclick="this.closest('.bullet-item').remove()">×</button>`;
-  el.appendChild(d);
-}
-function initBullets(){
-  [['bList1',DATA.hosp],['bList2',DATA.hhc],['bList3',DATA.hosp2]].forEach(([id,arr])=>{
-    const el=document.getElementById(id);
-    el.innerHTML='';
-    arr.forEach(t=>mkBullet(t,el));
-  });
-}
-function addBullet(id){
-  const el=document.getElementById(id);
-  mkBullet('New note…',el);
-  const last=[...el.querySelectorAll('.bullet-txt')].pop();
-  last.focus();
-  const r=document.createRange(); r.selectNodeContents(last);
-  const s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
-}
+    var cols = t==='h'
+        ? [{c:'#10b981',s:0,e:.33},{c:'#f59e0b',s:.33,e:.67},{c:'#ef4444',s:.67,e:1}]
+        : [{c:'#ef4444',s:0,e:.33},{c:'#f59e0b',s:.33,e:.67},{c:'#10b981',s:.67,e:1}];
 
-// Traffic Light Functions
-function openDrop(i){
-  document.querySelectorAll('.col-drop').forEach((d,j)=>{ if(j!==i) d.classList.remove('open'); });
-  document.getElementById('drop'+i).classList.toggle('open');
-}
-function setLight(i,c){
-  const l=document.querySelectorAll('.light')[i];
-  l.classList.remove('c-red','c-yellow','c-green','c-grey');
-  l.classList.add('c-'+c);
-  document.getElementById('drop'+i).classList.remove('open');
-}
-document.addEventListener('click',e=>{
-  if(!e.target.closest('.lw')) document.querySelectorAll('.col-drop').forEach(d=>d.classList.remove('open'));
-});
+    var sa = Math.PI, ea = 2*Math.PI, sp = ea-sa;
 
-// IMAGE HANDLING - COMPLETELY FIXED
-(function(){
-  const imgEl = document.getElementById('pastedImg');
-  const placeholder = document.getElementById('pastePlaceholder');
-  const sizeRow = document.getElementById('sizeRow');
-  const removeBtn = document.getElementById('removeBtn');
-  const sizeValEl = document.getElementById('sizeVal');
-  const pasteInner = document.getElementById('pasteInner');
-  const fileInput = document.getElementById('fileIn');
-
-  // Show image function
-  function showImage(dataUrl) {
-    imgEl.onload = function() {
-      imgEl.classList.add('visible');
-      placeholder.style.display = 'none';
-      sizeRow.classList.add('visible');
-      removeBtn.style.display = 'inline-flex';
-      document.getElementById('sizeSlider').value = 100;
-      sizeValEl.textContent = '100%';
-    };
-    imgEl.onerror = function() {
-      alert('Error loading image. Please try a different image.');
-    };
-    imgEl.src = dataUrl;
-  }
-
-  // Handle file function
-  function handleFile(file) {
-    if (!file || !file.type.startsWith('image/')) {
-      alert('Please select an image file');
-      return;
+    for(var i=0; i<cols.length; i++) {
+        x.beginPath();
+        x.arc(cx,cy,r, sa+sp*cols[i].s, sa+sp*cols[i].e);
+        x.lineWidth=30;
+        x.strokeStyle=cols[i].c;
+        x.globalAlpha=.25;
+        x.stroke();
     }
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      showImage(e.target.result);
-    };
-    reader.onerror = function() {
-      alert('Error reading file');
-    };
-    reader.readAsDataURL(file);
-  }
 
-  // File input change event
-  fileInput.addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-      handleFile(file);
+    x.globalAlpha=1;
+    var ang = sa+sp*(v/100);
+
+    var ec, col;
+    if(t==='h') {
+        if(v<=33){ec='😊';col='#10b981';}
+        else if(v<=66){ec='😐';col='#f59e0b';}
+        else{ec='😟';col='#ef4444';}
+    } else {
+        if(v>=67){ec='😊';col='#10b981';}
+        else if(v>=34){ec='😐';col='#f59e0b';}
+        else{ec='😟';col='#ef4444';}
     }
-    fileInput.value = '';
-  });
 
-  // Paste event
-  pasteInner.addEventListener('paste', function(e) {
-    e.preventDefault();
-    const items = e.clipboardData.items;
-    
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf('image') !== -1) {
-        const file = items[i].getAsFile();
-        if (file) {
-          handleFile(file);
-          return;
-        }
-      }
-    }
-    
-    // Also try clipboardData.files
-    const files = e.clipboardData.files;
-    if (files && files.length > 0) {
-      handleFile(files[0]);
-    }
-  });
+    x.beginPath();
+    x.arc(cx,cy,r,sa,ang);
+    x.lineWidth=30;
+    x.strokeStyle=col;
+    x.lineCap='round';
+    x.stroke();
 
-  // Drag and drop
-  pasteInner.addEventListener('dragover', function(e) {
-    e.preventDefault();
-    pasteInner.classList.add('dragover');
-  });
+    var nl=r-22;
+    var nx=cx+nl*Math.cos(ang), ny=cy+nl*Math.sin(ang);
+    x.beginPath();
+    x.moveTo(cx,cy);
+    x.lineTo(nx,ny);
+    x.lineWidth=4;
+    x.strokeStyle='#1a1f36';
+    x.lineCap='round';
+    x.stroke();
 
-  pasteInner.addEventListener('dragleave', function(e) {
-    e.preventDefault();
-    pasteInner.classList.remove('dragover');
-  });
+    x.beginPath();
+    x.arc(cx,cy,10,0,2*Math.PI);
+    x.fillStyle='#1a1f36';
+    x.fill();
 
-  pasteInner.addEventListener('drop', function(e) {
-    e.preventDefault();
-    pasteInner.classList.remove('dragover');
-    
-    const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      handleFile(files[0]);
-    }
-  });
+    x.beginPath();
+    x.arc(cx,cy,6,0,2*Math.PI);
+    x.fillStyle='#fff';
+    x.fill();
 
-  // Click to focus
-  placeholder.addEventListener('click', function() {
-    pasteInner.focus();
-  });
-
-  // Global clear function
-  window.clearImage = function() {
-    imgEl.src = '';
-    imgEl.classList.remove('visible');
-    placeholder.style.display = 'flex';
-    sizeRow.classList.remove('visible');
-    removeBtn.style.display = 'none';
-  };
-
-  // Global resize function
-  window.resizeImg = function(val) {
-    imgEl.style.maxWidth = val + '%';
-    sizeValEl.textContent = val + '%';
-  };
-})();
-
-// Gauge Functions
-function emojiColor(score, type){
-  if(type==='hospital'){
-    if(score<=33) return {e:'😊',c:'#10b981'};
-    if(score<=66) return {e:'😐',c:'#f59e0b'};
-    return {e:'😟',c:'#ef4444'};
-  }
-  if(score>=67) return {e:'😊',c:'#10b981'};
-  if(score>=34) return {e:'😐',c:'#f59e0b'};
-  return {e:'😟',c:'#ef4444'};
+    document.getElementById('e'+n).textContent = ec;
+    document.getElementById('s'+n).innerHTML = v+'%';
+    document.getElementById('s'+n).style.color = col;
 }
 
-function drawGauge(id, score, type){
-  const cv=document.getElementById(id);
-  if(!cv) return;
-  const ctx=cv.getContext('2d');
-  const W=cv.width, H=cv.height;
-  const cx=W/2, cy=H/2, R=150;
-  ctx.clearRect(0,0,W,H);
-
-  const secs = type==='hospital'
-    ? [{c:'#10b981',s:0,e:.33},{c:'#f59e0b',s:.33,e:.67},{c:'#ef4444',s:.67,e:1}]
-    : [{c:'#ef4444',s:0,e:.33},{c:'#f59e0b',s:.33,e:.67},{c:'#10b981',s:.67,e:1}];
-
-  const sA=Math.PI, eA=2*Math.PI, span=eA-sA;
-
-  // Background arcs
-  secs.forEach(sec=>{
-    ctx.beginPath();
-    ctx.arc(cx,cy,R, sA+span*sec.s, sA+span*sec.e);
-    ctx.lineWidth=30; ctx.strokeStyle=sec.c; ctx.globalAlpha=.25; ctx.stroke();
-  });
-
-  // Active arc
-  ctx.globalAlpha=1;
-  const angle=sA+span*(score/100);
-  const {e,c}=emojiColor(score,type);
-
-  ctx.beginPath(); ctx.arc(cx,cy,R,sA,angle);
-  ctx.lineWidth=30; ctx.strokeStyle=c; ctx.lineCap='round'; ctx.stroke();
-
-  // Needle
-  const nL=R-22;
-  const nx=cx+nL*Math.cos(angle), ny=cy+nL*Math.sin(angle);
-  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(nx,ny);
-  ctx.lineWidth=4; ctx.strokeStyle='#1a1f36'; ctx.lineCap='round'; ctx.stroke();
-  
-  // Pivot
-  ctx.beginPath(); ctx.arc(cx,cy,10,0,2*Math.PI); ctx.fillStyle='#1a1f36'; ctx.fill();
-  ctx.beginPath(); ctx.arc(cx,cy,6,0,2*Math.PI); ctx.fillStyle='#fff'; ctx.fill();
-
-  // Update text
-  const n=id.replace('g','');
-  const eEl=document.getElementById('e'+n);
-  const sEl=document.getElementById('s'+n);
-  if(eEl) eEl.textContent=e;
-  if(sEl) sEl.style.color=c;
-}
-
-function updScore(n, val){
-  val=Math.max(0,Math.min(100,parseInt(val)||0));
-  const types=['hospital','hhcahps','hospice'];
-  document.getElementById('si'+n).value=val;
-  document.getElementById('s'+n).innerHTML=val+'<span style="font-size:18px">%</span>';
-  drawGauge('g'+n, val, types[n-1]);
-}
-
-function initGauges(){
-  [{id:'g1',sc:68,t:'hospital'},{id:'g2',sc:70,t:'hhcahps'},{id:'g3',sc:70,t:'hospice'}]
-    .forEach((g,i)=> setTimeout(()=>drawGauge(g.id,g.sc,g.t), i*80));
-}
-
-// Reset Function
-function resetDashboard(){
-  if(!confirm('Reset to defaults?')) return;
-  document.getElementById('si1').value=68;
-  document.getElementById('si2').value=70;
-  document.getElementById('si3').value=70;
-  ['c-grey','c-yellow','c-grey'].forEach((c,i)=>{
-    const l=document.querySelectorAll('.light')[i];
-    l.classList.remove('c-red','c-yellow','c-green','c-grey');
-    l.classList.add(c);
-  });
-  ['date1','date2','date3'].forEach(id=>document.getElementById(id).value='2024-06-24');
-  if(window.clearImage) window.clearImage();
-  initRisks();
-  initBullets();
-  updScore(1,68); updScore(2,70); updScore(3,70);
-  alert('Done – dashboard reset.');
-}
-
-// Print Function
-function printDashboard(){
-  document.querySelectorAll('.col-drop').forEach(d=>d.classList.remove('open'));
-  window.print();
-}
-
-// Initialize
-window.addEventListener('DOMContentLoaded',()=>{
-  initRisks();
-  initBullets();
-  initGauges();
-});
-
-window.addEventListener('resize',()=>{
-  ['hospital','hhcahps','hospice'].forEach((t,i)=>{
-    drawGauge('g'+(i+1), parseInt(document.getElementById('si'+(i+1)).value)||0, t);
-  });
-});
+// INITIALIZE GAUGES
+draw(1,68);
+draw(2,70);
+draw(3,70);
 </script>
+
 </body>
 </html>

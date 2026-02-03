@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPM Clinical Analysis Dashboard - David & Katherine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: #ffffff;
+            --secondary-bg: #f8f9fa;
+            --border-color: #e0e5eb;
+            --text-primary: #1a1f36;
+            --text-secondary: #697386;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --grey: #6b7280;
+            --teal: #0891b2;
+            --orange: #f97316;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── CONTROLS BAR ─── */
+        .controls-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 12px 24px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: flex-end;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .btn-reset { background: #ef4444; color: white; }
+        .btn-reset:hover { background: #dc2626; }
+        .btn-print { background: white; color: #667eea; }
+        .btn-print:hover { background: #f3f4f6; }
+
+        /* ─── HEADER ─── */
+        .header {
+            background: linear-gradient(135deg, #1a1f36 0%, #2d3748 100%);
+            color: white;
+            padding: 16px 32px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        .header h1 { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
+        .header p { font-size: 12px; opacity: 0.85; }
+
+        /* ─── MAIN LAYOUT ─── */
+        .dashboard-container {
+            flex: 1;
+            background: var(--primary-bg);
+        }
+        .main-layout {
+            display: grid;
+            grid-template-columns: 30% 70%;
+            min-height: calc(100vh - 104px);
+        }
+
+        /* ─── LEFT COLUMN ─── */
+        .left-column {
+            background: #fafbfc;
+            border-right: 2px solid var(--border-color);
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Traffic Light */
+        .traffic-light-container {
+            background: #2d3748;
+            padding: 16px 20px;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            margin: 0 auto;
+        }
+        .traffic-light { display: flex; gap: 16px; justify-content: center; align-items: center; }
+        .light-wrapper { position: relative; }
+        .light {
+            width: 52px; height: 52px; border-radius: 50%; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .light::after {
+            content:''; position:absolute; inset:8px; border-radius:50%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+        }
+        .light:hover { transform: scale(1.08); }
+        .light.color-red   { background:#ef4444; box-shadow:0 0 24px rgba(239,68,68,0.6), inset 0 2px 8px rgba(0,0,0,0.3); }
+        .light.color-yellow { background:#f59e0b; box-shadow:0 0 24px rgba(245,158,11,0.6), inset 0 2px 8px rgba(0,0,0,0.3); }
+        .light.color-green  { background:#10b981; box-shadow:0 0 24px rgba(16,185,129,0.6), inset 0 2px 8px rgba(0,0,0,0.3); }
+        .light.color-grey   { background:#6b7280; box-shadow: inset 0 2px 8px rgba(0,0,0,0.3); }
+
+        /* Color Dropdown */
+        .color-dropdown {
+            position:absolute; top:62px; left:50%; transform:translateX(-50%);
+            background:white; border-radius:12px; padding:8px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.2); display:none; z-index:1000;
+            border:1px solid var(--border-color);
+        }
+        .color-dropdown.active { display:block; animation:dropdownFade 0.2s ease; }
+        @keyframes dropdownFade {
+            from { opacity:0; transform:translateX(-50%) translateY(-10px); }
+            to   { opacity:1; transform:translateX(-50%) translateY(0); }
+        }
+        .color-option {
+            width:40px; height:40px; border-radius:50%; margin:4px; cursor:pointer;
+            transition:all 0.2s; border:3px solid transparent;
+            box-shadow:0 2px 8px rgba(0,0,0,0.15); display:inline-block;
+        }
+        .color-option:hover { transform:scale(1.15); border-color:#667eea; }
+        .color-option.red    { background:#ef4444; }
+        .color-option.yellow { background:#f59e0b; }
+        .color-option.green  { background:#10b981; }
+        .color-option.grey   { background:#6b7280; }
+
+        /* ─── RISK SECTION ─── */
+        .risk-section-header {
+            font-size: 14px; font-weight: 700; color: var(--text-primary);
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .risk-list {
+            background: white; border-radius: 8px; padding: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .risk-item {
+            display: flex; gap: 6px; margin-bottom: 8px;
+            font-size: 12px; line-height: 1.5; align-items: flex-start;
+        }
+        .risk-item:last-child { margin-bottom: 0; }
+        .risk-number { flex-shrink:0; font-weight:700; color:var(--danger); min-width:20px; padding-top:2px; }
+        .risk-text {
+            flex: 1; border: 1px solid transparent; border-radius: 4px;
+            padding: 4px 6px; transition: all 0.2s; background: transparent;
+            font-size: 12px; line-height: 1.45;
+        }
+        .risk-text:focus { outline:none; border-color:#667eea; background:#f0f4ff; }
+        .risk-text[contenteditable="true"]:hover { background:#fafbfc; border-color:var(--border-color); }
+
+        /* ─── MINI CONTROL BUTTONS ─── */
+        .ctrl-btn {
+            width: 22px; height: 22px; border: none; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; line-height: 1; transition: all 0.15s;
+            flex-shrink: 0; padding: 0;
+        }
+        .ctrl-btn:hover { transform: scale(1.15); }
+        .ctrl-btn.add { background: #10b981; color: white; }
+        .ctrl-btn.add:hover { background: #059669; }
+        .ctrl-btn.del { background: #ef4444; color: white; }
+        .ctrl-btn.del:hover { background: #dc2626; }
+
+        /* ─── IMAGE PASTE ZONE ─── */
+        .graph-upload-section {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            background: white;
+            transition: all 0.3s;
+            cursor: pointer;
+            min-height: 130px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .graph-upload-section:hover,
+        .graph-upload-section.drag-over {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        .graph-upload-section.has-image {
+            padding: 8px;
+            border-style: solid;
+            min-height: auto;
+            cursor: default;
+        }
+        .upload-placeholder { 
+            display:flex; 
+            flex-direction:column; 
+            align-items:center; 
+            justify-content:center;
+        }
+        .upload-icon { font-size: 28px; margin-bottom: 6px; }
+        .upload-text { 
+            color:var(--text-secondary); 
+            font-size:11px; 
+            font-weight:500; 
+            text-align:center; 
+            line-height:1.5; 
+        }
+        
+        /* File input and label */
+        .file-upload-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .file-upload-label {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .file-upload-label:hover {
+            background: #5568d3;
+        }
+        input[type="file"] { 
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Image preview + size controls */
+        .img-wrapper { 
+            width:100%; 
+            position:relative;
+            display: none;
+        }
+        .img-wrapper.active {
+            display: block;
+        }
+        .graph-preview {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+        .img-controls {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 8px; gap: 6px;
+        }
+        .img-controls label { font-size: 10px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+        .img-controls input[type="range"] {
+            flex: 1; height: 4px; -webkit-appearance: none; appearance: none;
+            background: #cbd5e0; border-radius: 2px; outline: none;
+        }
+        .img-controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #667eea; cursor: pointer;
+        }
+        .img-controls input[type="range"]::-moz-range-thumb {
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #667eea; cursor: pointer; border: none;
+        }
+        .img-controls .size-val { font-size: 10px; font-weight: 700; color: #667eea; min-width: 30px; text-align: right; }
+        .img-remove {
+            display: flex; justify-content: center; margin-top: 4px;
+        }
+        .img-remove button {
+            background: #ef4444; color: white; border: none; border-radius: 4px;
+            padding: 3px 10px; font-size: 10px; font-weight: 600; cursor: pointer;
+        }
+        .img-remove button:hover { background: #dc2626; }
+
+        /* ─── RIGHT COLUMN ─── */
+        .right-column {
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .metric-row {
+            display: grid;
+            grid-template-columns: 75% 25%;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .metric-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+        /* Text Section */
+        .text-section { display:flex; flex-direction:column; gap:12px; }
+        .metric-header {
+            display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;
+        }
+        .date-input {
+            background:#1a1f36; color:white; border:none; padding:6px 12px;
+            border-radius:6px; font-size:10px; font-weight:600;
+            text-transform:uppercase; cursor:pointer; letter-spacing:0.5px;
+        }
+        .date-input::-webkit-calendar-picker-indicator { filter:invert(1); cursor:pointer; }
+
+        .metric-title { font-size:22px; font-weight:800; letter-spacing:-0.02em; text-transform:uppercase; }
+        .metric-title.hospital { color:var(--danger); }
+        .metric-title.hhcahps  { color:var(--teal); }
+        .metric-title.hospice  { color:var(--orange); }
+
+        .bullet-list {
+            background:#fafbfc; border:1px solid var(--border-color);
+            border-radius:8px; padding:14px;
+        }
+        .bullet-item {
+            display:flex; gap:6px; margin-bottom:8px;
+            font-size:12px; line-height:1.55; color:var(--text-primary); align-items:flex-start;
+        }
+        .bullet-item:last-child { margin-bottom:0; }
+        .bullet-item .bullet-dot { flex-shrink:0; font-weight:700; color:var(--text-primary); padding-top:1px; }
+        .bullet-text {
+            flex:1; border:1px solid transparent; border-radius:4px;
+            padding:3px 5px; transition:all 0.2s; background:transparent;
+        }
+        .bullet-text:focus { outline:none; border-color:#667eea; background:white; }
+        .bullet-text[contenteditable="true"]:hover { background:white; border-color:var(--border-color); }
+
+        /* Section header row with add button */
+        .section-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+
+        /* ─── GAUGE ─── */
+        .gauge-section { display:flex; flex-direction:column; gap:10px; align-items:center; }
+        .gauge-canvas-wrapper { position:relative; width:100%; max-width:200px; aspect-ratio:1; }
+        canvas { width:100%; height:100%; }
+        .gauge-overlay {
+            position:absolute; top:45%; left:50%; transform:translate(-50%,-50%);
+            text-align:center; pointer-events:none;
+        }
+        .gauge-emoji { font-size:36px; display:block; margin-bottom:6px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        .gauge-score { font-size:26px; font-weight:800; line-height:1; transition:color 0.3s; }
+        .gauge-label { font-size:9px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em; margin-top:4px; }
+        .score-input-wrapper { width:100%; max-width:200px; }
+        .score-input {
+            width:100%; padding:8px; border:2px solid var(--border-color); border-radius:6px;
+            font-size:16px; font-weight:700; text-align:center; font-family:'Inter',sans-serif; transition:all 0.2s;
+        }
+        .score-input:focus { outline:none; border-color:#667eea; box-shadow:0 0 0 3px rgba(102,126,234,0.1); }
+
+        .gauge-legend {
+            display:flex; flex-direction:row; justify-content:space-between;
+            gap:4px; width:100%; max-width:200px; flex-wrap:wrap;
+        }
+        .legend-item { display:flex; align-items:center; gap:4px; font-size:8px; font-weight:600; text-transform:uppercase; letter-spacing:0.02em; white-space:nowrap; }
+        .legend-color { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+
+        /* ─── SCROLLBARS ─── */
+        .risk-list::-webkit-scrollbar, .bullet-list::-webkit-scrollbar { width:4px; }
+        .risk-list::-webkit-scrollbar-track, .bullet-list::-webkit-scrollbar-track { background:#f1f1f1; border-radius:10px; }
+        .risk-list::-webkit-scrollbar-thumb, .bullet-list::-webkit-scrollbar-thumb { background:#cbd5e0; border-radius:10px; }
+
+        /* ═══════════════════════════════════════
+           PRINT STYLES — exact dashboard, no controls
+        ═══════════════════════════════════════ */
+        @media print {
+            @page { 
+                size: A4 landscape; 
+                margin: 0.5cm;
+            }
+
+            body {
+                min-height: auto;
+                background: white;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Hide all controls */
+            .controls-bar        { display: none !important; }
+            .ctrl-btn            { display: none !important; }
+            .img-controls        { display: none !important; }
+            .img-remove          { display: none !important; }
+            .color-dropdown      { display: none !important; }
+            .score-input-wrapper { display: none !important; }
+            .file-upload-wrapper { display: none !important; }
+            .upload-placeholder  { display: none !important; }
+
+            /* Make contenteditable look like plain text */
+            [contenteditable="true"] {
+                border: none !important;
+                background: transparent !important;
+                outline: none !important;
+            }
+            [contenteditable="true"]:hover {
+                background: transparent !important;
+                border-color: transparent !important;
+            }
+
+            .date-input { cursor: default; }
+
+            /* Preserve the exact layout */
+            .header {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .dashboard-container { 
+                flex:1;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .main-layout {
+                display: grid;
+                grid-template-columns: 30% 70%;
+                min-height: auto;
+            }
+            .left-column {
+                border-right: 2px solid var(--border-color);
+                background: #fafbfc;
+                padding: 20px 16px;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .right-column { 
+                padding: 20px 24px;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .metric-row {
+                display: grid;
+                grid-template-columns: 75% 25%;
+                border-bottom: 2px solid var(--border-color);
+                padding-bottom: 20px;
+                page-break-inside: avoid;
+            }
+            .metric-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+            /* Keep gauge canvases visible */
+            canvas { 
+                display: block !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Traffic lights keep their colors */
+            .traffic-light-container {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background: #2d3748 !important;
+            }
+            .light { 
+                box-shadow: inset 0 2px 8px rgba(0,0,0,0.3) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .light.color-red    { 
+                background: #ef4444 !important;
+                box-shadow: 0 0 24px rgba(239,68,68,0.6), inset 0 2px 8px rgba(0,0,0,0.3) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .light.color-yellow { 
+                background: #f59e0b !important;
+                box-shadow: 0 0 24px rgba(245,158,11,0.6), inset 0 2px 8px rgba(0,0,0,0.3) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .light.color-green  { 
+                background: #10b981 !important;
+                box-shadow: 0 0 24px rgba(16,185,129,0.6), inset 0 2px 8px rgba(0,0,0,0.3) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .light.color-grey {
+                background: #6b7280 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Image shows at its current size, no controls */
+            .graph-upload-section {
+                border: 1px solid var(--border-color) !important;
+                cursor: default !important;
+                background: white !important;
+                min-height: auto !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .graph-upload-section:hover {
+                border-color: var(--border-color) !important;
+                background: white !important;
+            }
+            .img-wrapper { 
+                display: block !important;
+            }
+            .graph-preview { 
+                display: block !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Force all colors to print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 1400px) { .main-layout { grid-template-columns: 35% 65%; } }
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; }
+            .metric-row  { grid-template-columns: 65% 35%; }
+        }
+        @media (max-width: 768px) { .metric-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<!-- ─── TOP CONTROL BAR ─── -->
+<div class="controls-bar">
+    <button class="btn btn-reset" onclick="resetDashboard()">🔄 Reset Dashboard</button>
+    <button class="btn btn-print" onclick="printDashboard()">🖨️ Print Dashboard</button>
+</div>
+
+<!-- ─── HEADER ─── -->
+<div class="header">
+    <h1>🏥 Remote Patient Monitoring - Clinical Analysis Dashboard</h1>
+    <p>Comprehensive risk assessment and care coordination metrics | Generated by Clinical Care Team</p>
+</div>
+
+<!-- ─── DASHBOARD ─── -->
+<div class="dashboard-container">
+    <div class="main-layout">
+
+        <!-- ════════ LEFT COLUMN (30%) ════════ -->
+        <div class="left-column">
+
+            <!-- Traffic Light -->
+            <div class="traffic-light-container">
+                <div class="traffic-light">
+                    <div class="light-wrapper">
+                        <div class="light color-grey" onclick="toggleColorDropdown(0)"></div>
+                        <div class="color-dropdown" id="dropdown-0">
+                            <div class="color-option red"    onclick="changeColor(0,'red')"></div>
+                            <div class="color-option yellow" onclick="changeColor(0,'yellow')"></div>
+                            <div class="color-option green"  onclick="changeColor(0,'green')"></div>
+                            <div class="color-option grey"   onclick="changeColor(0,'grey')"></div>
+                        </div>
+                    </div>
+                    <div class="light-wrapper">
+                        <div class="light color-yellow" onclick="toggleColorDropdown(1)"></div>
+                        <div class="color-dropdown" id="dropdown-1">
+                            <div class="color-option red"    onclick="changeColor(1,'red')"></div>
+                            <div class="color-option yellow" onclick="changeColor(1,'yellow')"></div>
+                            <div class="color-option green"  onclick="changeColor(1,'green')"></div>
+                            <div class="color-option grey"   onclick="changeColor(1,'grey')"></div>
+                        </div>
+                    </div>
+                    <div class="light-wrapper">
+                        <div class="light color-grey" onclick="toggleColorDropdown(2)"></div>
+                        <div class="color-dropdown" id="dropdown-2">
+                            <div class="color-option red"    onclick="changeColor(2,'red')"></div>
+                            <div class="color-option yellow" onclick="changeColor(2,'yellow')"></div>
+                            <div class="color-option green"  onclick="changeColor(2,'green')"></div>
+                            <div class="color-option grey"   onclick="changeColor(2,'grey')"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- High Risk Factors (dynamic) -->
+            <div>
+                <div class="risk-section-header">
+                    High Risk Factors
+                    <button class="ctrl-btn add" onclick="addRiskItem()" title="Add risk factor">+</button>
+                </div>
+                <div class="risk-list" id="riskList"></div>
+            </div>
+
+            <!-- Image Paste / Upload Zone -->
+            <div class="graph-upload-section" id="graphUploadSection" onclick="triggerFileUpload()">
+                <div class="upload-placeholder" id="uploadPlaceholder">
+                    <div class="upload-icon">📊</div>
+                    <div class="upload-text">
+                        <div class="file-upload-wrapper">
+                            <label class="file-upload-label">
+                                📂 Choose File
+                                <input type="file" id="upload" accept="image/*" onchange="handleFileUpload(event)">
+                            </label>
+                        </div>
+                        <div style="margin-top:8px;">or drag and drop image here</div>
+                    </div>
+                </div>
+
+                <div class="img-wrapper" id="imgWrapper">
+                    <img id="preview" class="graph-preview">
+                    <div class="img-controls">
+                        <label>Size:</label>
+                        <input type="range" id="imgSizeSlider" min="50" max="150" value="100" oninput="adjustImageSize(this.value)">
+                        <span class="size-val" id="sizeVal">100%</span>
+                    </div>
+                    <div class="img-remove">
+                        <button onclick="removeImage(event)">Remove Image</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ RIGHT COLUMN (70%) ════════ -->
+        <div class="right-column">
+
+            <!-- Row 1: Hospital Risk -->
+            <div class="metric-row">
+                <div class="text-section">
+                    <div class="metric-header">
+                        <input type="date" class="date-input" id="date1" value="2024-06-24">
+                        <div class="metric-title hospital">HOSPITAL RISK</div>
+                    </div>
+                    <div class="section-head">
+                        <span style="font-size:11px;color:var(--text-secondary);font-weight:600;">Clinical Notes</span>
+                        <button class="ctrl-btn add" onclick="addBullet('bulletList1')" title="Add bullet">+</button>
+                    </div>
+                    <div class="bullet-list" id="bulletList1"></div>
+                </div>
+                <div class="gauge-section">
+                    <div class="score-input-wrapper">
+                        <input type="number" class="score-input" id="scoreInput1" min="0" max="100" value="68" oninput="updateScore(1,this.value)">
+                    </div>
+                    <div class="gauge-canvas-wrapper">
+                        <canvas id="gauge1" width="400" height="400"></canvas>
+                        <div class="gauge-overlay">
+                            <span class="gauge-emoji" id="emoji1">😟</span>
+                            <div class="gauge-score" id="score1">68<span style="font-size:20px;">%</span></div>
+                            <div class="gauge-label">Risk Score</div>
+                        </div>
+                    </div>
+                    <div class="gauge-legend">
+                        <div class="legend-item"><div class="legend-color" style="background:#10b981;"></div><span>Good 0-33%</span></div>
+                        <div class="legend-item"><div class="legend-color" style="background:#f59e0b;"></div><span>Fair 34-66%</span></div>
+                        <div class="legend-item"><div class="legend-color" style="background:#ef4444;"></div><span>Poor 67-100%</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: HHCAHPS -->
+            <div class="metric-row">
+                <div class="text-section">
+                    <div class="metric-header">
+                        <input type="date" class="date-input" id="date2" value="2024-06-24">
+                        <div class="metric-title hhcahps">HHCAHPS</div>
+                    </div>
+                    <div class="section-head">
+                        <span style="font-size:11px;color:var(--text-secondary);font-weight:600;">Clinical Notes</span>
+                        <button class="ctrl-btn add" onclick="addBullet('bulletList2')" title="Add bullet">+</button>
+                    </div>
+                    <div class="bullet-list" id="bulletList2"></div>
+                </div>
+                <div class="gauge-section">
+                    <div class="score-input-wrapper">
+                        <input type="number" class="score-input" id="scoreInput2" min="0" max="100" value="70" oninput="updateScore(2,this.value)">
+                    </div>
+                    <div class="gauge-canvas-wrapper">
+                        <canvas id="gauge2" width="400" height="400"></canvas>
+                        <div class="gauge-overlay">
+                            <span class="gauge-emoji" id="emoji2">😊</span>
+                            <div class="gauge-score" id="score2">70<span style="font-size:20px;">%</span></div>
+                            <div class="gauge-label">HHCAHPS Score</div>
+                        </div>
+                    </div>
+                    <div class="gauge-legend">
+                        <div class="legend-item"><div class="legend-color" style="background:#ef4444;"></div><span>Poor 0-33%</span></div>
+                        <div class="legend-item"><div class="legend-color" style="background:#f59e0b;"></div><span>Fair 34-66%</span></div>
+                        <div class="legend-item"><div class="legend-color" style="background:#10b981;"></div><span>Good 67-100%</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Hospice Need -->
+            <div class="metric-row">
+                <div class="text-section">
+                    <div class="metric-header">
+                        <input type="date" class="date-input" id="date3" value="2024-06-24">
+                        <div class="metric-title hospice">HOSPICE NEED</div>
+                    </div>
+                    <div class="section-head">
+                        <span style="font-size:11px;color:var(--text-secondary);font-weight:600;">Clinical Notes</span>
+                        <button class="ctrl-btn add" onclick="addBullet('bulletList3')" title="Add bullet">+</button>
+                    </div>
+                    <div class="bullet-list" id="bulletList3"></div>
+                </div>
+                <div class="gauge-section">
+                    <div class="score-input-wrapper">
+                        <input type="number" class="score-input" id="scoreInput3" min="0" max="100" value="70" oninput="updateScore(3,this.value)">
+                    </div>
+                    <div class="gauge-canvas-wrapper">
+                        <canvas id="gauge3" width="400" height="400"></canvas>
+                        <div class="gauge-overlay">
+                            <span class="gauge-emoji" id="emoji3">😊</span>
+                            <div class="gauge-score" id="score3">70<span style="font-size:20px;">%</span></div>
+                            <div class="gauge-label">Care Need Score</div>
+                        </div>
+                    </div>
+                    <div class="gauge-legend">
+                        <div class="legend-item"><div class="legend-color" style="background:#ef4444;"></div><span>Poor 0-33%</span></div>
+                        <div class="legend-item"><div class="legend-color" style="background:#f59e0b;"></div><span>Fair 34-66%</span></div>
+                        <div class="legend-item"><div class="legend-color" style="background:#10b981;"></div><span>Good 67-100%</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════
+//  DATA
+// ═══════════════════════════════════
+const clinicalData = {
+    riskFactors: [
+        "Indwelling Foley catheter with leaking and discomfort complications",
+        "UTI risk 35-40% from catheter since 12/10/25",
+        "Untreated Stage 1-2 HTN: BP 144-151/71 mmHg",
+        "Zero antihypertensive medications despite age 79 and HTN",
+        "History of falling without documented fall assessment",
+        "Voiding trial scheduled 12/19/25 with 20-25% failure risk",
+        "Incomplete medication list: only 2 medications documented",
+        "Headaches potentially indicating uncontrolled hypertension symptoms",
+        "Walker dependent with taxing effort limiting mobility",
+        "Age 79 with stroke/MI risk 12-18% annually",
+        "No orthostatic BP measurements despite fall history",
+        "Tylenol 1000mg single dose exceeds recommended 650mg"
+    ],
+    hospitalRisk: [
+        "David's Blood Pressure monitoring is critically absent with no BP readings documented despite HTN diagnosis and hydrochlorothiazide 12.5mg with hold parameter \"if SBP <110\"; cannot assess control or hypotension risk",
+        "David has engaged with care team through skilled nursing visits for complex wound care, colostomy management, and suprapubic catheter care at board and care facility",
+        "David had 0 BP measurements documented despite HTN diagnosis requiring urgent monitoring establishment",
+        "David has board and care facility caregivers providing 24-hour supervision and assistance as documented in clinical notes",
+        "David has limited family support with emergency contact Louis Hernandez; caregivers at facility provide total assistance for mobility, transfers, and ADLs as needed"
+    ],
+    hhcahps: [
+        "Katherine has routine contact with care team through scheduled skilled nursing (SN) and physical therapy (PT) visits",
+        "Katherine has NOT initiated contact on her own via SMS or phone (no documentation of patient-initiated contact)",
+        "Katherine's care team includes: Ana Moreno-Quirarte RN (medication review, assessment), Lindsay PTA (physical therapy visits), and physician oversight"
+    ],
+    hospiceNeed: [
+        "Katherine has NOT had a kidney transplant (no transplant history documented)",
+        "Katherine's weight: Not documented in available records (weight monitoring needed)",
+        "Katherine reports: \"Lots of pain\" documented in clinical notes; exhaustion documented as risk factor; pain management with ice/medication education provided",
+        "Katherine does NOT have a stage 2 wound (surgical wound from right hip replacement; no current wound documented)"
+    ]
+};
+
+// ═══════════════════════════════════
+//  RISK FACTORS — dynamic add / remove
+// ═══════════════════════════════════
+function renderRiskItem(text, container) {
+    const item = document.createElement('div');
+    item.className = 'risk-item';
+    item.innerHTML = `
+        <div class="risk-number"></div>
+        <div class="risk-text" contenteditable="true">${text}</div>
+        <button class="ctrl-btn del" onclick="removeRiskItem(this)" title="Remove">×</button>
+    `;
+    container.appendChild(item);
+}
+
+function renumberRisks() {
+    document.querySelectorAll('#riskList .risk-number').forEach((el, i) => {
+        el.textContent = (i + 1) + '.';
+    });
+}
+
+function initializeRiskFactors() {
+    const list = document.getElementById('riskList');
+    list.innerHTML = '';
+    clinicalData.riskFactors.forEach(t => renderRiskItem(t, list));
+    renumberRisks();
+}
+
+function addRiskItem() {
+    const list = document.getElementById('riskList');
+    renderRiskItem('New risk factor…', list);
+    renumberRisks();
+    const items = list.querySelectorAll('.risk-text');
+    items[items.length - 1].focus();
+    const range = document.createRange();
+    range.selectNodeContents(items[items.length - 1]);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+}
+
+function removeRiskItem(btn) {
+    btn.closest('.risk-item').remove();
+    renumberRisks();
+}
+
+// ═══════════════════════════════════
+//  BULLET LISTS — dynamic add / remove
+// ═══════════════════════════════════
+function renderBulletItem(text, container) {
+    const item = document.createElement('div');
+    item.className = 'bullet-item';
+    item.innerHTML = `
+        <span class="bullet-dot">•</span>
+        <div class="bullet-text" contenteditable="true">${text}</div>
+        <button class="ctrl-btn del" onclick="removeBulletItem(this)" title="Remove">×</button>
+    `;
+    container.appendChild(item);
+}
+
+function initializeBulletLists() {
+    const map = [
+        { id: 'bulletList1', data: clinicalData.hospitalRisk },
+        { id: 'bulletList2', data: clinicalData.hhcahps },
+        { id: 'bulletList3', data: clinicalData.hospiceNeed }
+    ];
+    map.forEach(({ id, data }) => {
+        const el = document.getElementById(id);
+        el.innerHTML = '';
+        data.forEach(t => renderBulletItem(t, el));
+    });
+}
+
+function addBullet(listId) {
+    const list = document.getElementById(listId);
+    renderBulletItem('New note…', list);
+    const items = list.querySelectorAll('.bullet-text');
+    const last = items[items.length - 1];
+    last.focus();
+    const range = document.createRange();
+    range.selectNodeContents(last);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+}
+
+function removeBulletItem(btn) {
+    btn.closest('.bullet-item').remove();
+}
+
+// ═══════════════════════════════════
+//  TRAFFIC LIGHT
+// ═══════════════════════════════════
+function toggleColorDropdown(idx) {
+    const target = document.getElementById('dropdown-' + idx);
+    document.querySelectorAll('.color-dropdown').forEach((d, i) => {
+        if (i !== idx) d.classList.remove('active');
+    });
+    target.classList.toggle('active');
+}
+
+function changeColor(idx, color) {
+    const lights = document.querySelectorAll('.light');
+    lights[idx].classList.remove('color-red','color-yellow','color-green','color-grey');
+    lights[idx].classList.add('color-' + color);
+    document.getElementById('dropdown-' + idx).classList.remove('active');
+}
+
+document.addEventListener('click', e => {
+    if (!e.target.closest('.light-wrapper'))
+        document.querySelectorAll('.color-dropdown').forEach(d => d.classList.remove('active'));
+});
+
+// ═══════════════════════════════════
+//  IMAGE UPLOAD & MANAGEMENT
+// ═══════════════════════════════════
+function triggerFileUpload() {
+    const imgWrapper = document.getElementById('imgWrapper');
+    if (!imgWrapper.classList.contains('active')) {
+        document.getElementById('upload').click();
+    }
+}
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const preview = document.getElementById('preview');
+        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+        const imgWrapper = document.getElementById('imgWrapper');
+        const graphSection = document.getElementById('graphUploadSection');
+
+        preview.src = e.target.result;
+        uploadPlaceholder.style.display = 'none';
+        imgWrapper.classList.add('active');
+        graphSection.classList.add('has-image');
+        graphSection.style.cursor = 'default';
+        
+        // Reset size slider
+        document.getElementById('imgSizeSlider').value = 100;
+        document.getElementById('sizeVal').textContent = '100%';
+        preview.style.width = '100%';
+    };
+    reader.readAsDataURL(file);
+}
+
+function adjustImageSize(value) {
+    const preview = document.getElementById('preview');
+    preview.style.width = value + '%';
+    document.getElementById('sizeVal').textContent = value + '%';
+}
+
+function removeImage(event) {
+    event.stopPropagation();
+    const preview = document.getElementById('preview');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const imgWrapper = document.getElementById('imgWrapper');
+    const graphSection = document.getElementById('graphUploadSection');
+    const fileInput = document.getElementById('upload');
+
+    preview.src = '';
+    fileInput.value = '';
+    uploadPlaceholder.style.display = 'flex';
+    imgWrapper.classList.remove('active');
+    graphSection.classList.remove('has-image');
+    graphSection.style.cursor = 'pointer';
+}
+
+// Drag and drop support
+document.addEventListener('DOMContentLoaded', () => {
+    const dropZone = document.getElementById('graphUploadSection');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            if (!dropZone.classList.contains('has-image')) {
+                dropZone.classList.add('drag-over');
+            }
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.remove('drag-over');
+        }, false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        if (dropZone.classList.contains('has-image')) return;
+        
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                const fileInput = document.getElementById('upload');
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+                
+                handleFileUpload({ target: fileInput });
+            }
+        }
+    }, false);
+});
+
+// ═══════════════════════════════════
+//  GAUGES
+// ═══════════════════════════════════
+function getEmojiAndColor(score, type) {
+    if (type === 'hospital') {
+        if (score <= 33) return { emoji:'😊', color:'#10b981' };
+        if (score <= 66) return { emoji:'😐', color:'#f59e0b' };
+        return { emoji:'😟', color:'#ef4444' };
+    }
+    if (score >= 67) return { emoji:'😊', color:'#10b981' };
+    if (score >= 34) return { emoji:'😐', color:'#f59e0b' };
+    return { emoji:'😟', color:'#ef4444' };
+}
+
+function drawGauge(canvasId, score, type) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const cx = canvas.width / 2, cy = canvas.height / 2, radius = 150;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const sections = type === 'hospital'
+        ? [{ color:'#10b981', s:0, e:0.33 },{ color:'#f59e0b', s:0.33, e:0.67 },{ color:'#ef4444', s:0.67, e:1 }]
+        : [{ color:'#ef4444', s:0, e:0.33 },{ color:'#f59e0b', s:0.33, e:0.67 },{ color:'#10b981', s:0.67, e:1 }];
+
+    const startA = Math.PI, endA = 2 * Math.PI;
+
+    // bg arcs
+    sections.forEach(sec => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, startA + (endA - startA)*sec.s, startA + (endA - startA)*sec.e);
+        ctx.lineWidth = 32;
+        ctx.strokeStyle = sec.color;
+        ctx.globalAlpha = 0.25;
+        ctx.stroke();
+    });
+
+    // active arc
+    ctx.globalAlpha = 1;
+    const scoreAngle = startA + (endA - startA) * (score / 100);
+    const { emoji, color } = getEmojiAndColor(score, type);
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, startA, scoreAngle);
+    ctx.lineWidth = 32;
+    ctx.strokeStyle = color;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // needle shadow
+    const nLen = radius - 20;
+    const nx = cx + nLen * Math.cos(scoreAngle);
+    const ny = cy + nLen * Math.sin(scoreAngle);
+    ctx.beginPath(); ctx.moveTo(cx+2, cy+2); ctx.lineTo(nx+2, ny+2);
+    ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineCap = 'round'; ctx.stroke();
+
+    // needle
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(nx, ny);
+    ctx.lineWidth = 5; ctx.strokeStyle = '#1a1f36'; ctx.lineCap = 'round'; ctx.stroke();
+
+    // center dot
+    ctx.beginPath(); ctx.arc(cx, cy, 12, 0, 2*Math.PI); ctx.fillStyle = '#1a1f36'; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 8,  0, 2*Math.PI); ctx.fillStyle = 'white';   ctx.fill();
+
+    // update overlay
+    const num = canvasId.replace('gauge','');
+    const emojiEl = document.getElementById('emoji' + num);
+    const scoreEl = document.getElementById('score' + num);
+    if (emojiEl) emojiEl.textContent = emoji;
+    if (scoreEl) scoreEl.style.color = color;
+}
+
+function updateScore(num, val) {
+    val = Math.max(0, Math.min(100, parseInt(val) || 0));
+    const types = ['hospital','hhcahps','hospice'];
+    document.getElementById('scoreInput' + num).value = val;
+    document.getElementById('score' + num).innerHTML = val + '<span style="font-size:20px;">%</span>';
+    drawGauge('gauge' + num, val, types[num - 1]);
+}
+
+function initializeGauges() {
+    [{ id:'gauge1', score:68, type:'hospital' },
+     { id:'gauge2', score:70, type:'hhcahps' },
+     { id:'gauge3', score:70, type:'hospice' }
+    ].forEach((g, i) => setTimeout(() => drawGauge(g.id, g.score, g.type), i * 100));
+}
+
+// ═══════════════════════════════════
+//  RESET
+// ═══════════════════════════════════
+function resetDashboard() {
+    if (!confirm('Reset dashboard to default values? All custom changes will be lost.')) return;
+
+    // scores
+    document.getElementById('scoreInput1').value = 68;
+    document.getElementById('scoreInput2').value = 70;
+    document.getElementById('scoreInput3').value = 70;
+
+    // traffic lights
+    const defColors = ['grey','yellow','grey'];
+    document.querySelectorAll('.light').forEach((l, i) => {
+        l.classList.remove('color-red','color-yellow','color-green','color-grey');
+        l.classList.add('color-' + defColors[i]);
+    });
+
+    // dates
+    ['date1','date2','date3'].forEach(id => document.getElementById(id).value = '2024-06-24');
+
+    // image
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const imgWrapper = document.getElementById('imgWrapper');
+    if (imgWrapper.classList.contains('active')) {
+        const fakeEvent = { stopPropagation: () => {} };
+        removeImage(fakeEvent);
+    }
+
+    // data
+    initializeRiskFactors();
+    initializeBulletLists();
+
+    // gauges
+    updateScore(1, 68);
+    updateScore(2, 70);
+    updateScore(3, 70);
+
+    alert('Dashboard reset to defaults.');
+}
+
+// ═══════════════════════════════════
+//  PRINT — exact layout, no controls
+// ═══════════════════════════════════
+function printDashboard() {
+    // close any open color dropdowns
+    document.querySelectorAll('.color-dropdown').forEach(d => d.classList.remove('active'));
+    window.print();
+}
+
+// ═══════════════════════════════════
+//  INIT
+// ═══════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+    initializeRiskFactors();
+    initializeBulletLists();
+    initializeGauges();
+});
+
+// redraw gauges on resize
+window.addEventListener('resize', () => {
+    const types = ['hospital','hhcahps','hospice'];
+    [1,2,3].forEach(n => {
+        drawGauge('gauge'+n, parseInt(document.getElementById('scoreInput'+n).value)||0, types[n-1]);
+    });
+});
+</script>
+</body>
+</html>
